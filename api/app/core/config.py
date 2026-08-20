@@ -61,7 +61,7 @@ class Settings:
 
         # Upload / scan limits. These are guard rails, not preferences: they
         # stop a runaway repository from exhausting memory.
-        self.max_archive_mb: int = _env_int("MAX_ARCHIVE_MB", 200)
+        self.max_archive_mb: int = _env_int("MAX_ARCHIVE_MB", 5120)
         self.max_extracted_mb: int = _env_int("MAX_EXTRACTED_MB", 600)
         self.max_files: int = _env_int("MAX_FILES", 8000)
         self.max_file_kb_default: int = _env_int("MAX_FILE_KB_DEFAULT", 400)

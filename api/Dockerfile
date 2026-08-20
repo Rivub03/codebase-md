@@ -18,10 +18,7 @@ ENV PATH="/venv/bin:$PATH" \
 WORKDIR /app
 COPY . .
 
-RUN useradd -m -u 1000 appuser \
-    && mkdir -p /app/.work \
-    && chown -R appuser:appuser /app
-USER appuser
+RUN mkdir -p /app/.work
 
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \

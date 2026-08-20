@@ -138,7 +138,9 @@ Notable backend settings:
 - `ALLOW_REMOTE_FETCH` / `GITHUB_TOKEN` — set a token to raise GitHub's rate
   limit and allow private repositories.
 - `MAX_ARCHIVE_MB`, `MAX_EXTRACTED_MB`, `MAX_FILES`, `MAX_FILE_KB_CEILING` —
-  guard rails against a runaway upload or repository.
+  guard rails against a runaway upload or repository. `MAX_ARCHIVE_MB` defaults
+  to `5120` (5 GB), and the web app warns users before uploads larger than
+  20 MB because large archives can still be slow or memory intensive.
 
 ## Testing
 
