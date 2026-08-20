@@ -19,7 +19,7 @@ ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME=0.0.0.0
 
-RUN useradd -m -u 1000 appuser
+RUN useradd -m appuser
 
 # "standalone" output already contains a minimal node_modules — no npm
 # install needed in the final image.
