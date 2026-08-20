@@ -3,6 +3,11 @@
 import { useCallback, useRef, useState } from "react";
 import type { Capabilities, SourceKind } from "../lib/types";
 import {
+  LARGE_ARCHIVE_WARNING_BYTES,
+  LARGE_ARCHIVE_WARNING_MB,
+  formatFileSize,
+} from "../lib/uploadLimits";
+import {
   IconArchive,
   IconClose,
   IconFolder,
@@ -54,11 +59,8 @@ export default function SourcePanel({
     [onFileChange],
   );
 
-  const sizeLabel = file
-    ? file.size > 1024 * 1024
-      ? `${(file.size / 1024 / 1024).toFixed(1)} MB`
-      : `${Math.max(1, Math.round(file.size / 1024))} KB`
-    : "";
+  const sizeLabel = file ? formatFileSize(file.size) : "";
+  const isLargeArchive = Boolean(file && file.size > LARGE_ARCHIVE_WARNING_BYTES);
 
   return (
     <section>
@@ -143,6 +145,12 @@ export default function SourcePanel({
                 <div>
                   <div className="dropzone-file-name">{file.name}</div>
                   <div className="dropzone-hint">{sizeLabel}</div>
+                  {isLargeArchive && (
+                    <div className="dropzone-warning">
+                      Archives over {LARGE_ARCHIVE_WARNING_MB} MB may take a long time
+                      or fail on machines with limited memory.
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -163,7 +171,9 @@ export default function SourcePanel({
                 <div className="dropzone-title">Drop an archive, or browse</div>
                 <div className="dropzone-hint">
                   zip · tar · tar.gz
-                  {capabilities ? ` · up to ${capabilities.max_archive_mb} MB` : ""}
+                  {capabilities
+                    ? ` · up to ${formatFileSize(capabilities.max_archive_mb * 1024 * 1024)}`
+                    : ""}
                 </div>
               </>
             )}

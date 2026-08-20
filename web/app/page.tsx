@@ -23,6 +23,10 @@ import {
   type ConvertOptions,
   type SourceKind,
 } from "./lib/types";
+import {
+  bytesFromMegabytes,
+  formatFileSize,
+} from "./lib/uploadLimits";
 
 const EMPTY_GLYPH = `  repo/
   ├── api/
@@ -91,12 +95,26 @@ export default function Page() {
         ? localPath.split("/").filter(Boolean).pop() ?? "codebase"
         : repoUrl.split("/").filter(Boolean).pop() ?? "repository";
 
+  const maxArchiveBytes = capabilities
+    ? bytesFromMegabytes(capabilities.max_archive_mb)
+    : null;
+  const selectedArchiveError =
+    kind === "upload" && file && maxArchiveBytes !== null && file.size > maxArchiveBytes
+      ? `Archive is ${formatFileSize(file.size)}, but this server allows up to ${formatFileSize(maxArchiveBytes)}.`
+      : null;
+
   const ready =
-    (kind === "upload" && file !== null)
-    || (kind === "path" && localPath.trim().length > 0)
-    || (kind === "remote" && repoUrl.trim().length > 0);
+    ((kind === "upload" && file !== null)
+      || (kind === "path" && localPath.trim().length > 0)
+      || (kind === "remote" && repoUrl.trim().length > 0))
+    && selectedArchiveError === null;
 
   async function convert() {
+    if (selectedArchiveError) {
+      setError(selectedArchiveError);
+      return;
+    }
+
     if (!ready || running) return;
 
     closeStream.current?.();
@@ -254,6 +272,16 @@ export default function Page() {
             a project to a model, a reviewer, or your future self.
           </p>
         </header>
+
+        {selectedArchiveError && (
+          <div className="alert alert-error enter enter-2" role="alert">
+            <IconAlert className="alert-icon" />
+            <div>
+              <div className="alert-title">Archive is too large</div>
+              {selectedArchiveError}
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="alert alert-error enter enter-2" role="alert">

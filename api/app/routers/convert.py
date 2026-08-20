@@ -52,7 +52,7 @@ async def convert_upload(
 ) -> JobCreated:
     """Convert an uploaded archive."""
     parsed = _parse_options(options)
-    name = file.filename or "upload.zip"
+    name = Path(file.filename or "upload.zip").name
     label = Path(name).stem or "codebase"
 
     job = store.create(label)
