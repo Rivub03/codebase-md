@@ -104,11 +104,10 @@ async def convert_path(
     if not settings.allow_local_path:
         raise HTTPException(403, "Reading local paths is disabled on this server.")
 
-    root = Path(payload.path).expanduser()
-    try:
-        root = root.resolve(strict=True)
-    except (OSError, RuntimeError) as exc:
-        raise HTTPException(404, f"Path not found: {payload.path}") from exc
+    root = Path(payload.path).expanduser().resolve()
+
+    if not root.exists():
+        raise HTTPException(404, f"Path not found: {payload.path}")
 
     if not root.is_dir():
         raise HTTPException(400, "That path is a file. Point at a directory instead.")
