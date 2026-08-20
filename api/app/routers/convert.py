@@ -106,11 +106,13 @@ async def convert_path(
 
     root = Path(payload.path).expanduser().resolve()
 
-    if not root.exists():
-        raise HTTPException(404, f"Path not found: {payload.path}")
-
-    if not root.is_dir():
-        raise HTTPException(400, "That path is a file. Point at a directory instead.")
+    try:
+        if not root.exists():
+            raise HTTPException(404, f"Path not found: {payload.path}")
+        if not root.is_dir():
+            raise HTTPException(400, "That path is a file. Point at a directory instead.")
+    except PermissionError as exc:
+        raise HTTPException(403, f"Permission denied accessing: {payload.path}") from exc
 
     if settings.local_path_roots:
         allowed = [Path(p).expanduser().resolve() for p in settings.local_path_roots]
