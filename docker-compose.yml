@@ -1,0 +1,28 @@
+services:
+  api:
+    build: ./api
+    ports:
+      - "8080:8080"
+    environment:
+      CORS_ORIGINS: http://localhost:3000
+      ALLOW_LOCAL_PATH: "true"
+      # A directory mounted below so "Folder" mode has something real to
+      # point at from inside the container. Point this at your own projects.
+      LOCAL_PATH_ROOTS: /workspace
+    volumes:
+      - ./:/workspace:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build: ./web
+    ports:
+      - "3000:3000"
+    environment:
+      BACKEND_URL: http://api:8080
+    depends_on:
+      api:
+        condition: service_healthy
