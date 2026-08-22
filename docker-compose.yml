@@ -8,11 +8,16 @@ services:
       ALLOW_LOCAL_PATH: "true"
       # A directory mounted below so "Folder" mode has something real to
       # point at from inside the container. Point this at your own projects.
-      LOCAL_PATH_ROOTS: /workspace,/home
+      LOCAL_PATH_ROOTS: /workspace,/home,/mnt/windows-repos
       MAX_ARCHIVE_MB: "5120"
     volumes:
       - ./:/workspace:ro
       - /home:/home:ro
+      # Mount Windows directories that you want to access from the API
+      # Windows path: A:\ERA-Infotech\Internship\Computer Vision\Repositories
+      # Docker path:  /mnt/windows-repos
+      # Usage from web UI: /mnt/windows-repos/vlm-ocr-service
+      - /mnt/a:/mnt/windows-repos:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health')"]
       interval: 10s
