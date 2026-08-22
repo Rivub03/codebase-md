@@ -17,7 +17,7 @@ services:
       # Windows path: A:\ERA-Infotech\Internship\Computer Vision\Repositories
       # Docker path:  /mnt/windows-repos
       # Usage from web UI: /mnt/windows-repos/vlm-ocr-service
-      - /mnt/a:/mnt/windows-repos:ro
+      # - /mnt/a:/mnt/windows-repos:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health')"]
       interval: 10s
