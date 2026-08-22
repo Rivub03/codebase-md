@@ -34,10 +34,41 @@ def _normalize_path(path_str: str) -> str:
     
     Handles Windows paths with backslashes and converts them to forward slashes
     for consistent processing across Linux and Windows.
+    
+    Note: When running in Docker, Windows absolute paths (e.g., A:\path\to\dir)
+    must be mapped as volumes. Use the container path instead (e.g., /mnt/windows-repos).
     """
     # Convert backslashes to forward slashes (Windows path normalization)
     normalized = path_str.replace("\\", "/")
     return normalized
+
+
+def _validate_windows_path_usage(path_str: str) -> str:
+    """
+    Check if a Windows absolute path was provided and return helpful guidance.
+    
+    Returns an error message if the path looks like a Windows drive letter path,
+    since those need to be mounted as Docker volumes first.
+    """
+    normalized = path_str.replace("\\", "/")
+    
+    # Check for Windows drive letter pattern (e.g., A:, C:, etc.)
+    if len(normalized) >= 2 and normalized[1] == ':':
+        drive_letter = normalized[0].upper()
+        # Map common drive letters to their likely mount points
+        mount_point = f"/mnt/{drive_letter.lower()}"
+        
+        # Extract the path without the drive letter
+        remainder = normalized[2:].lstrip('/')
+        suggested_path = f"{mount_point}/{remainder}"
+        
+        return (
+            f"Windows absolute paths (like {path_str}) cannot be accessed directly in Docker. "
+            f"The Windows {drive_letter}: drive needs to be mounted as a volume. "
+            f"Try using the container path instead: {suggested_path}"
+        )
+    
+    return ""
 
 
 def _start(job, root: Path, options: ConvertOptions, tasks: BackgroundTasks) -> None:
@@ -118,10 +149,17 @@ async def convert_path(
 
     # Normalize the path to handle Windows backslashes
     normalized_path = _normalize_path(payload.path)
+    
+    # Check if this looks like a Windows absolute path and provide helpful guidance
+    windows_path_error = _validate_windows_path_usage(normalized_path)
+    
     root = Path(normalized_path).expanduser().resolve()
 
     try:
         if not root.exists():
+            # If the path doesn't exist and looks like a Windows path, provide better guidance
+            if windows_path_error:
+                raise HTTPException(400, windows_path_error)
             raise HTTPException(404, f"Path not found: {payload.path}")
         if not root.is_dir():
             raise HTTPException(400, "That path is a file. Point at a directory instead.")
