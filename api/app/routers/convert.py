@@ -28,6 +28,18 @@ router = APIRouter(prefix="/api/convert", tags=["convert"])
 CHUNK = 1 << 20  # 1 MB
 
 
+def _normalize_path(path_str: str) -> str:
+    """
+    Normalize a path string for cross-platform compatibility.
+    
+    Handles Windows paths with backslashes and converts them to forward slashes
+    for consistent processing across Linux and Windows.
+    """
+    # Convert backslashes to forward slashes (Windows path normalization)
+    normalized = path_str.replace("\\", "/")
+    return normalized
+
+
 def _start(job, root: Path, options: ConvertOptions, tasks: BackgroundTasks) -> None:
     loop = asyncio.get_running_loop()
     tasks.add_task(
@@ -104,7 +116,9 @@ async def convert_path(
     if not settings.allow_local_path:
         raise HTTPException(403, "Reading local paths is disabled on this server.")
 
-    root = Path(payload.path).expanduser().resolve()
+    # Normalize the path to handle Windows backslashes
+    normalized_path = _normalize_path(payload.path)
+    root = Path(normalized_path).expanduser().resolve()
 
     try:
         if not root.exists():
