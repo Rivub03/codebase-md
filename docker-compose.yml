@@ -4,7 +4,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      CORS_ORIGINS: http://localhost:3000
+      CORS_ORIGINS: http://localhost:3003
       ALLOW_LOCAL_PATH: "true"
       # A directory mounted below so "Folder" mode has something real to
       # point at from inside the container. Point this at your own projects.
@@ -19,7 +19,13 @@ services:
       # Usage from web UI: /mnt/windows-repos/vlm-ocr-service
       # - /mnt/a:/mnt/windows-repos:ro
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health')",
+        ]
       interval: 10s
       timeout: 3s
       retries: 5
@@ -27,7 +33,7 @@ services:
   web:
     build: ./web
     ports:
-      - "3000:3000"
+      - "3003:3003"
     environment:
       BACKEND_URL: http://api:8080
     depends_on:

@@ -30,7 +30,7 @@ Either can run independently. The frontend just calls the backend over HTTP.
 docker compose up --build
 ```
 
-Then open **http://localhost:3000**. The API is on **http://localhost:8080**
+Then open **http://localhost:3003**. The API is on **http://localhost:8080**
 (`/docs` for the OpenAPI schema). The compose file mounts the repo root
 read-only into the API container so "Folder" mode has something to browse —
 point `LOCAL_PATH_ROOTS` in `docker-compose.yml` at wherever your own projects
@@ -61,7 +61,7 @@ uvicorn app.main:app --reload --port 8080
 cd web
 npm install
 cp .env.example .env.local     # BACKEND_URL defaults to localhost:8080
-npm run dev                    # http://localhost:3000
+npm run dev                    # http://localhost:3003
 ```
 
 The frontend proxies `/api/*` to `BACKEND_URL` (see `next.config.ts`), so the
@@ -100,7 +100,7 @@ scan → filter → classify → render
 - **Render**: emits the tree with box-drawing connectors, then each file
   under a heading whose depth reflects its position in the tree, fenced with
   a language tag inferred from ~150 extensions and well-known filenames
-  (`Dockerfile`, `Makefile`, `.env`, …). Fences grow past ```` ``` ```` when a
+  (`Dockerfile`, `Makefile`, `.env`, …). Fences grow past ` ``` ` when a
   file's own content contains a fence, so nothing downstream ever breaks.
 
 Three sources, one pipeline: uploaded archives are extracted with zip-slip and
@@ -112,16 +112,16 @@ pulled as a zipball (no `git` binary required) and unwrapped from their
 
 Full interactive docs at `/docs` once the backend is running. The shape:
 
-| Endpoint | Method | What it does |
-|---|---|---|
-| `/api/convert/upload` | POST | Start a conversion from an uploaded archive |
-| `/api/convert/path` | POST | Start a conversion from a server-local directory |
-| `/api/convert/remote` | POST | Start a conversion from a GitHub repo |
-| `/api/jobs/{id}` | GET | Poll a job's status and stats |
-| `/api/jobs/{id}/events` | GET | Server-sent events: live progress |
-| `/api/jobs/{id}/markdown` | GET | The result as plain text |
-| `/api/jobs/{id}/download` | GET | The result as a file download |
-| `/api/capabilities` | GET | What this deployment allows (used by the UI) |
+| Endpoint                  | Method | What it does                                     |
+| ------------------------- | ------ | ------------------------------------------------ |
+| `/api/convert/upload`     | POST   | Start a conversion from an uploaded archive      |
+| `/api/convert/path`       | POST   | Start a conversion from a server-local directory |
+| `/api/convert/remote`     | POST   | Start a conversion from a GitHub repo            |
+| `/api/jobs/{id}`          | GET    | Poll a job's status and stats                    |
+| `/api/jobs/{id}/events`   | GET    | Server-sent events: live progress                |
+| `/api/jobs/{id}/markdown` | GET    | The result as plain text                         |
+| `/api/jobs/{id}/download` | GET    | The result as a file download                    |
+| `/api/capabilities`       | GET    | What this deployment allows (used by the UI)     |
 
 Every conversion accepts an `options` object — see `ConvertOptions` in
 `api/app/models/schemas.py` for the full set (section grouping, path style,
@@ -157,8 +157,8 @@ their own code fences, and placeholder-directory handling.
 
 ## Notes on the format
 
-The heading depth for a directory at relative depth *d* within its section is
-`#` × (*d* + 2); a file at relative depth *d* is `#` × (*d* + 3), capped at
+The heading depth for a directory at relative depth _d_ within its section is
+`#` × (_d_ + 2); a file at relative depth _d_ is `#` × (_d_ + 3), capped at
 `######`. That reproduces a progression like:
 
 ```

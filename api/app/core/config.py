@@ -56,7 +56,7 @@ class Settings:
         # CORS — the Next.js dev server by default.
         self.cors_origins: list[str] = _env_list(
             "CORS_ORIGINS",
-            ["http://localhost:3000", "http://127.0.0.1:3000"],
+            ["http://localhost:3003", "http://127.0.0.1:3003"],
         )
 
         # Upload / scan limits. These are guard rails, not preferences: they
